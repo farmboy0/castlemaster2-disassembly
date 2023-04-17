@@ -6416,27 +6416,22 @@ L9dea_game_over_reason_message:
 ; - Checks if the game is over and displays game over screen
 L9dec_game_tick:
     ld hl, 0
-    ld (L746c_game_flags), hl
+    L746c_game_flags=0
     ld a, h
-    ld (L7480_under_pointer_object_ID), a
-    ld (L7477_render_buffer_effect), a  ; no render effect
-    ld (L747f_player_event), a
-    ld (L7473_timer_event), a
-    ld (L747a_requested_SFX), a
-    ld (L7476_trigger_collision_event_flag), a
-    ld (L6b2b_desired_eye_compass_frame), a
-    ld (L9de9_current_key_index), a
+    L7480_under_pointer_object_ID=0
+    L7477_render_buffer_effect=0  ; no render effect
+    L747f_player_event=0
+    L7473_timer_event=0
+    L747a_requested_SFX=0
+    L7476_trigger_collision_event_flag=0
+    L6b2b_desired_eye_compass_frame=0
+    L9de9_current_key_index=0
     ld a, (L6b0e_lightning_time_seconds_countdown)
     or a
-    jr nz, L9e53_countdown_not_zero
+    if (L6b0e_lightning_time_seconds_countdown > 0) goto L9e53_countdown_not_zero
     ; Each time the second countdown reaches zero, if (L6b19_current_area_flags) is != 0, there is a lightning
-    ld a, r
-    and #3f
-    add a, 10
-    ld (L6b0e_lightning_time_seconds_countdown), a  ; (L6b0e_lightning_time_seconds_countdown) = 10 + randint(0, 64)
-    ld a, (L6b19_current_area_flags)
-    or a
-    jr z, L9e53_countdown_not_zero
+    L6b0e_lightning_time_seconds_countdown=10+(rand()&0x3F)  ; (L6b0e_lightning_time_seconds_countdown) = 10 + randint(0, 64)
+    if (L6b19_current_area_flags==0) goto L9e53_countdown_not_zero
     ld a, (L6add_desired_attribute_color)
     push af
         ; Change attributes, and wait for one interrupt:
@@ -6463,8 +6458,8 @@ L9e40_wait_for_interrupt_loop:
 
     ld a, SFX_LIGHTNING
     call Lc4ca_play_SFX
-    ld a, 8
-    ld (L746c_game_flags + 1), a
+
+    L746c_game_flags[1]=8
 
 L9e53_countdown_not_zero:
     ld a, (L6adf_game_boolean_variables + 3)
